@@ -64,27 +64,31 @@
         </div>
         @endforeach
     </div>
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-[#E1E6D1] px-6 py-4 flex justify-around items-center z-50 rounded-t-[32px] shadow-[0_-4px_10px_rgba(0,0,0,0.02)]">
+    <div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-sm bg-white h-20 rounded-[35px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] flex justify-around items-center border border-gray-100 z-50 px-4">
     
-    <a href="/inventory" class="flex flex-col items-center text-[#4F6F52]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-        </svg>
-        <span class="text-[10px] font-black uppercase mt-1">Stok</span>
+    <a href="/" class="flex flex-col items-center transition-all duration-300 {{ Request::is('/') ? 'scale-125' : 'opacity-30 hover:opacity-60' }}">
+        <span class="text-2xl">🏠</span>
+        @if(Request::is('/')) <div class="w-1 h-1 bg-[#4F6F52] rounded-full mt-1"></div> @endif
     </a>
 
-    <a href="/kasir" class="flex flex-col items-center text-[#739072] hover:text-[#4F6F52]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-        </svg>
-        <span class="text-[10px] font-black uppercase mt-1">Kasir</span>
+    <a href="/inventory" class="flex flex-col items-center transition-all duration-300 {{ Request::is('inventory*') ? 'scale-125' : 'opacity-30 hover:opacity-60' }}">
+        <span class="text-2xl">🛍️</span>
+        @if(Request::is('inventory*')) <div class="w-1 h-1 bg-[#4F6F52] rounded-full mt-1"></div> @endif
     </a>
 
-    <a href="/laporan" class="flex flex-col items-center text-[#739072] hover:text-[#4F6F52]">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-        </svg>
-        <span class="text-[10px] font-black uppercase mt-1">Laporan</span>
+    <a href="/kasir" class="flex flex-col items-center transition-all duration-300 {{ Request::is('kasir*') ? 'scale-125' : 'opacity-30 hover:opacity-60' }}">
+        <span class="text-2xl">🛒</span>
+        @if(Request::is('kasir*')) <div class="w-1 h-1 bg-[#4F6F52] rounded-full mt-1"></div> @endif
+    </a>
+
+    <a href="/laporan" class="flex flex-col items-center transition-all duration-300 {{ Request::is('laporan*') ? 'scale-125' : 'opacity-30 hover:opacity-60' }}">
+        <span class="text-2xl">📊</span>
+        @if(Request::is('laporan*')) <div class="w-1 h-1 bg-[#4F6F52] rounded-full mt-1"></div> @endif
+    </a>
+
+    <a href="/akun" class="flex flex-col items-center transition-all duration-300 {{ Request::is('akun*') ? 'scale-125' : 'opacity-30 hover:opacity-60' }}">
+        <span class="text-2xl">👤</span>
+        @if(Request::is('akun*')) <div class="w-1 h-1 bg-[#4F6F52] rounded-full mt-1"></div> @endif
     </a>
 
 </div>

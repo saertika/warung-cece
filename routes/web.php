@@ -3,25 +3,44 @@
 use App\Http\Controllers\BarangController;
 use Illuminate\Support\Facades\Route;
 
-// Baris ini sangat penting! 
-// Ini artinya: Kalau orang buka alamat utama (localhost:8000), 
-// arahkan ke fungsi 'index' yang ada di BarangController.
-Route::get('/', [BarangController::class, 'index']);
-Route::get('/inventory', [BarangController::class, 'inventory']);
-Route::get('/akun', [BarangController::class, 'akun']);
-Route::get('/tambah-barang', function () {
-    return view('barang.create');
+
+
+// --- RUTE PUBLIK (Bisa dibuka tanpa login) ---
+Route::get('/login', [BarangController::class, 'showLogin'])->name('login');
+Route::post('/login', [BarangController::class, 'login']);
+Route::post('/logout', [BarangController::class, 'logout'])->name('logout');
+
+
+// --- RUTE TERPROTEKSI (Wajib Login) ---
+Route::middleware(['auth'])->group(function () {
+    
+    // Dashboard Utama
+    Route::get('/', [BarangController::class, 'dashboard'])->name('dashboard');
+
+    // Inventory & Barang (CRUD)
+    Route::get('/inventory', [BarangController::class, 'inventory'])->name('inventory');
+    
+    // Tambah Barang
+    Route::get('/tambah-barang', function () {
+        return view('barang.create');
+    })->name('barang.create');
+    Route::post('/simpan-barang', [BarangController::class, 'store'])->name('barang.store');
+    
+    // Edit Barang
+    Route::get('/edit-barang/{id}', [BarangController::class, 'edit'])->name('barang.edit');
+    Route::post('/update-barang/{id}', [BarangController::class, 'update'])->name('barang.update');
+    
+    // Hapus Barang (Pakai GET biar gampang dipanggil di tombol <a>)
+    Route::get('/hapus-barang/{id}', [BarangController::class, 'destroy'])->name('barang.destroy');
+
+    // Kasir & Penjualan
+    Route::get('/kasir', [BarangController::class, 'kasir'])->name('kasir');
+    Route::post('/proses-jual', [BarangController::class, 'prosesJual'])->name('proses.jual');
+
+    // Laporan & Grafik
+    Route::get('/laporan', [BarangController::class, 'barangLaku'])->name('laporan');
+    Route::get('/grafik', [BarangController::class, 'tampilkanGrafik'])->name('grafik');
+    
+    // Akun & Keuntungan
+    Route::get('/akun', [BarangController::class, 'akun'])->name('akun');
 });
-Route::post('/simpan-barang', [BarangController::class, 'store']);
-// Edit & Update
-Route::get('/edit-barang/{id}', [BarangController::class, 'edit']);
-Route::post('/update-barang/{id}', [BarangController::class, 'update']);
-
-// Hapus
-Route::get('/hapus-barang/{id}', [BarangController::class, 'destroy']);
-// Halaman untuk memilih barang yang mau dijual
-Route::get('/kasir', [BarangController::class, 'kasir']);
-
-// Proses pengurangannya (pakai POST karena kirim data form)
-Route::post('/proses-jual', [BarangController::class, 'prosesJual']);
-Route::get('/', [BarangController::class, 'dashboard']);

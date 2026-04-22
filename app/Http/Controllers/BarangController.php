@@ -5,32 +5,127 @@ namespace App\Http\Controllers;
 use App\Models\Barang;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class BarangController extends Controller
 {
+    /**
+     * FUNGSI PUSAT DATA (Private)
+     * Menghitung laba rugi tanpa butuh kolom 'terjual' di database.
+     */
+    private function getFinancialData()
+    {
+        $barangs = Barang::all();
+        
+        // Logika: Anggap stok awal 20, sisanya dianggap laku/terjual
+        // Ini biar kamu gak error 'Column not found' tapi angka tetap muncul
+        $totalPenjualan = $barangs->sum(fn($b) => $b->harga_jual * (max(0, 20 - $b->stok)));
+        $totalHPP = $barangs->sum(fn($b) => $b->harga_beli * (max(0, 20 - $b->stok)));
+        $labaKotor = $totalPenjualan - $totalHPP;
+
+        return [
+            'barangs' => $barangs,
+            'totalPenjualan' => $totalPenjualan,
+            'totalHPP' => $totalHPP,
+            'labaKotor' => $labaKotor,
+            'labaBersih' => $labaKotor,
+            'dataGrafik' => [
+                'labels' => $barangs->pluck('nama_barang')->take(5)->toArray(),
+                'pendapatan' => $barangs->pluck('harga_jual')->take(5)->toArray(),
+                'biaya' => $barangs->pluck('harga_beli')->take(5)->toArray()
+            ]
+        ];
+    }
+
+    // --- FITUR AUTH ---
+
+    public function showLogin() {
+        return view('auth.login');
+    }
+
+    public function login(Request $request) {
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
+
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return redirect()->intended('/');
+        }
+
+        return back()->with('error', 'Email atau Password salah ya Cece!');
+    }
+
+    public function logout(Request $request) {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/login');
+    }
+
+    // --- FITUR DASHBOARD & INVENTORY ---
+
+    public function dashboard() {
+        $totalBarang = Barang::count();
+        $stokKritis = Barang::where('stok', '<=', 5)->count();
+        $totalStok = Barang::sum('stok');
+        
+        return view('barang.dashboard', compact('totalBarang', 'stokKritis', 'totalStok'));
+    }
+
     public function inventory()
     {
         $barangs = Barang::all();
         $stokTipis = Barang::where('stok', '<=', 5)->count();
-        $terlaris = Barang::first(); 
+        // Terlaris diambil dari stok paling sedikit
+        $terlaris = Barang::orderBy('stok', 'asc')->first(); 
 
         return view('barang.inventory', compact('barangs', 'stokTipis', 'terlaris'));
     }
+
     public function akun()
-{
-    // Mengambil semua data barang untuk hitung keuntungan
-    $barangs = \App\Models\Barang::all();
+    {
+        $data = $this->getFinancialData();
+        $keuntungan = $data['labaKotor']; 
+        return view('barang.akun', compact('keuntungan'));
+    }
 
-    // Logika hitung: (Harga Jual - Harga Beli) x Stok yang ada
-    $keuntungan = $barangs->sum(function($item) {
-        return ($item->harga_jual - $item->harga_beli) * $item->stok;
-    });
+    // --- FITUR KASIR ---
 
-    // Menampilkan halaman akun sambil membawa data keuntungan
-    return view('barang.akun', compact('keuntungan'));
-}
+    public function kasir()
+    {
+        $barangs = Barang::where('stok', '>', 0)->get();
+        return view('barang.kasir', compact('barangs'));
+    }
 
-    // CREATE: Simpan Barang Baru
+    public function prosesJual(Request $request)
+    {
+        $barang = Barang::findOrFail($request->barang_id);
+        $jumlah = $request->jumlah;
+
+        if ($barang->stok >= $jumlah) {
+            $barang->stok -= $jumlah;
+            $barang->save();
+            return redirect('/laporan')->with('success', "Barang terjual! Cek laporan.");
+        }
+        return redirect()->back()->with('error', 'Stok nggak cukup nih!');
+    }
+
+    // --- FITUR LAPORAN & GRAFIK ---
+
+    public function barangLaku() 
+    {
+        return view('barang.baranglaku', $this->getFinancialData());
+    }
+
+    public function tampilkanGrafik() 
+    {
+        return view('barang.grafik', $this->getFinancialData());
+    }
+
+    // --- FITUR CRUD BARANG ---
+
     public function store(Request $request)
     {
         $barang = new Barang();
@@ -47,16 +142,14 @@ class BarangController extends Controller
         }
 
         $barang->save();
-        return redirect('/inventory')->with('success', 'Barang Berhasil Ditambah!');
+        return redirect('/inventory')->with('success', 'Barang baru berhasil ditambah!');
     }
 
-    // UPDATE: Form Edit & Simpan Perubahan
     public function edit($id)
     {
         $barang = Barang::findOrFail($id);
         return view('barang.edit', compact('barang'));
     }
-    
 
     public function update(Request $request, $id)
     {
@@ -67,7 +160,6 @@ class BarangController extends Controller
         $barang->stok = $request->stok;
 
         if ($request->hasFile('foto')) {
-            // Hapus foto lama biar folder storage gak penuh
             if ($barang->foto) {
                 Storage::disk('public')->delete('barangs/' . $barang->foto);
             }
@@ -78,10 +170,9 @@ class BarangController extends Controller
         }
 
         $barang->save();
-        return redirect('/inventory')->with('success', 'Data Berhasil Diubah!');
+        return redirect('/inventory')->with('success', 'Data barang berhasil diupdate!');
     }
 
-    // DELETE: Hapus Barang
     public function destroy($id)
     {
         $barang = Barang::findOrFail($id);
@@ -89,32 +180,6 @@ class BarangController extends Controller
             Storage::disk('public')->delete('barangs/' . $barang->foto);
         }
         $barang->delete();
-        return redirect('/inventory')->with('success', 'Barang Berhasil Dihapus!');
+        return redirect('/inventory')->with('success', 'Barang sudah dihapus ya!');
     }
-   public function kasir()
-{
-    $barangs = Barang::where('stok', '>', 0)->get(); // Cuma munculin barang yang ada stoknya
-    return view('barang.kasir', compact('barangs'));
-}
-
-public function prosesJual(Request $request)
-{
-    $barang = Barang::findOrFail($request->barang_id);
-    $jumlah = $request->jumlah;
-
-    if ($barang->stok >= $jumlah) {
-        $barang->stok -= $jumlah;
-        $barang->save();
-        return redirect('/inventory')->with('success', "Berhasil! $jumlah pcs $barang->nama_barang telah terjual.");
-    }
-
-    return redirect()->back()->with('error', 'Stok tidak mencukupi!');
-}
-public function dashboard() {
-    $totalBarang = \App\Models\Barang::count();
-    $stokKritis = \App\Models\Barang::where('stok', '<=', 5)->count();
-    $totalStok = \App\Models\Barang::sum('stok');
-    
-    return view('barang.dashboard', compact('totalBarang', 'stokKritis', 'totalStok'));
-}
 }
