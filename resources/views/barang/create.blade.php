@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Barang - Warung Cece</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-[#F9FBE7] min-h-screen flex items-center justify-center p-4">
+@extends('layouts.app')
+
+@section('title', 'Akun - Warung Cece')
+
+@section('content')
+    {{-- HEADER --}}
 
     <div class="max-w-md w-full bg-white p-8 rounded-[40px] shadow-sm">
         <h2 class="text-2xl font-black text-gray-800 mb-6 text-center">Tambah Stok Baru</h2>
@@ -43,7 +40,7 @@
             </div>
 
             <button type="submit" class="w-full bg-[#B2D2A4] text-gray-800 font-bold p-4 rounded-2xl shadow-lg hover:bg-opacity-80 transition mt-4">
-                Simpan ke Inventory
+                Simpan 
             </button>
             <a href="/inventory" class="block text-center text-xs text-gray-400 mt-2 hover:underline">Batal</a>
         </form>

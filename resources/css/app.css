@@ -9,3 +9,36 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ==========================================================================
+   TAMBAHAN KODE BACKGROUND KANTIN COMLAB UNTUK SEMUA HALAMAN
+   ========================================================================== */
+
+body {
+    /* 1. Pasang gambar kantin ke semua body halaman web */
+    background-image: url('/images/kantin.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* 2. Bikin lapisan overlay transparan di atas gambar biar tulisan tetep jelas */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    /* Menggunakan paduan warna background hijau-putih soft khas Warung Cece */
+    background-color: rgba(248, 250, 245, 0.85); 
+    backdrop-filter: blur(2px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* 3. Maksa semua elemen HTML anak berada di atas lapisan overlay */
+body > * {
+    position: relative;
+    z-index: 10;
+}

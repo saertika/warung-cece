@@ -43,7 +43,7 @@
             </div>
 
             <div>
-                <label class="block text-[10px] font-black text-[#739072] uppercase mb-1 ml-4">Ganti Foto (Kosongkan jika tetap)</label>
+                <label class="block text-[10px] font-black text-[#739072] uppercase mb-1 ml-4">Ganti Foto </label>
                 <div class="relative">
                     <input type="file" name="foto" 
                         class="w-full bg-[#F9FBE7] border-none rounded-2xl px-5 py-3 text-xs font-bold text-[#739072] file:hidden cursor-pointer">

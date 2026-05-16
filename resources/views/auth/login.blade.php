@@ -11,15 +11,16 @@
             <h1 class="text-3xl font-black text-[#4F6F52]">Warung Cece</h1>
             <p class="text-gray-500">Silakan login untuk kelola warung</p>
         </div>
+        
         @if ($errors->any())
-    <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">
-        <ul>
-            @foreach ($errors->all() as $error)
-                <li>{{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
+            <div class="mb-4 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-lg text-sm">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
         <form action="/login" method="POST">
             @csrf
@@ -35,6 +36,13 @@
                 Masuk Sekarang
             </button>
         </form>
-    </div>
+
+        <div class="text-center mt-6 pt-4 border-t border-gray-100">
+            <p class="text-xs text-gray-400 font-medium">
+                Belum punya akun? 
+                <a href="{{ route('register') }}" class="text-[#4F6F52] font-black hover:underline ml-0.5">Daftar di sini</a>
+            </p>
+        </div>
+        </div>
 </body>
 </html>

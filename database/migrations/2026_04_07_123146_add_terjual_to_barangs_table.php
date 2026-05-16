@@ -6,30 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('barangs', function (Blueprint $table) {
-        $table->id();
-        $table->string('nama_barang');
-        $table->integer('harga_beli'); // Pastikan ini ada
-        $table->integer('harga_jual');
-        $table->integer('stok');
-        $table->integer('terjual')->default(0); // TAMBAHKAN BARIS INI
-        $table->string('foto')->nullable();
-        $table->timestamps();
-    });
+        // Ganti 'create' jadi 'table' biar dia cuma modifikasi
+        Schema::table('barangs', function (Blueprint $table) {
+            // Cek dulu biar nggak dobel kolomnya
+            if (!Schema::hasColumn('barangs', 'terjual')) {
+                $table->integer('terjual')->default(0)->after('stok');
+            }
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('barangs', function (Blueprint $table) {
-            //
+            $table->dropColumn('terjual');
         });
     }
 };

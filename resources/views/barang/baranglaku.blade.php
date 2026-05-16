@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <title>Laporan Barang Laku - Warung Cece</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @media print {
-            .no-print { display: none !important; }
-            body { background-color: white !important; }
-            .report-container { border: none !important; box-shadow: none !important; width: 100% !important; margin: 0 !important; }
-        }
-    </style>
-</head>
-<body class="bg-[#F9FBE7] min-h-screen p-4 md:p-12">
+@extends('layouts.app')
+
+@section('title', 'Akun - Warung Cece')
+
+@section('content')
+    {{-- HEADER --}}
 
     <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center no-print">
         <a href="/" class="text-[#4F6F52] font-bold flex items-center gap-2 text-sm uppercase tracking-wider">
@@ -29,7 +20,7 @@
     <div class="max-w-4xl mx-auto bg-white p-12 shadow-2xl report-container rounded-sm border border-gray-200">
         
         <div class="text-center mb-10">
-            <h2 class="text-lg font-bold uppercase tracking-[0.2em] text-gray-800">Warung Mini SD</h2>
+            <h2 class="text-lg font-bold uppercase tracking-[0.2em] text-gray-800">Warung Cece</h2>
             <h1 class="text-2xl font-black text-red-700 mt-1 uppercase">Laba/Rugi (Standar)</h1>
             <p class="text-sm text-gray-500 font-medium italic">Periode: 01 April 2026 s/d 30 April 2026</p>
             <div class="flex justify-between text-[10px] text-gray-400 mt-6 border-b border-gray-100 pb-1 uppercase font-bold">
@@ -46,36 +37,53 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="font-bold"><td colspan="2" class="pt-6 pb-2 text-gray-800 uppercase tracking-tight">PENDAPATAN</td></tr>
-                <tr>
-                    <td class="pl-6 py-1 italic">Penjualan Barang Laku</td>
-                    <td class="text-right py-1 border-t border-gray-200 font-mono">{{ number_format($totalPenjualan, 0, ',', '.') }}</td>
-                </tr>
-                <tr class="font-bold border-t border-black bg-gray-50">
-                    <td class="py-2">JUMLAH PENDAPATAN</td>
-                    <td class="text-right py-2">{{ number_format($totalPenjualan, 0, ',', '.') }}</td>
-                </tr>
+    <tr class="font-bold">
+        <td colspan="2" class="pt-6 pb-2 text-gray-800 uppercase tracking-tight">PENDAPATAN</td>
+    </tr>
+    
+    @foreach($barangs as $b)
+    @if($b->terjual > 0)
+    <tr>
+        <td class="pl-6 py-1 italic text-gray-600">Penjualan {{ $b->nama_barang }} ({{ $b->terjual }} pcs)</td>
+        <td class="text-right py-1 font-mono text-gray-600">{{ number_format($b->harga_jual * $b->terjual, 0, ',', '.') }}</td>
+    </tr>
+    @endif
+    @endforeach
 
-                <tr class="font-bold"><td colspan="2" class="pt-8 pb-2 text-gray-800 uppercase tracking-tight">BEBAN POKOK PENJUALAN</td></tr>
-                <tr>
-                    <td class="pl-6 py-1 italic">Harga Pokok Penjualan (HPP)</td>
-                    <td class="text-right py-1 border-t border-gray-200 font-mono">({{ number_format($totalHPP, 0, ',', '.') }})</td>
-                </tr>
-                <tr class="font-bold border-t border-black bg-gray-50">
-                    <td class="py-2">JUMLAH BEBAN POKOK PENJUALAN</td>
-                    <td class="text-right py-2">({{ number_format($totalHPP, 0, ',', '.') }})</td>
-                </tr>
+    <tr class="font-bold border-t border-black bg-gray-50">
+        <td class="py-2">JUMLAH PENDAPATAN</td>
+        <td class="text-right py-2">{{ number_format($totalPenjualan, 0, ',', '.') }}</td>
+    </tr>
 
-                <tr class="font-bold text-base bg-gray-100">
-                    <td class="py-4 uppercase tracking-wider">LABA KOTOR</td>
-                    <td class="text-right py-4 border-t-2 border-black">{{ number_format($labaKotor, 0, ',', '.') }}</td>
-                </tr>
+    <tr class="font-bold">
+        <td colspan="2" class="pt-8 pb-2 text-gray-800 uppercase tracking-tight">BEBAN POKOK PENJUALAN</td>
+    </tr>
 
-                <tr class="font-black text-xl border-b-4 border-double border-black pt-10">
-                    <td class="py-6 uppercase">LABA BERSIH</td>
-                    <td class="text-right py-6 text-green-700 font-mono">{{ number_format($labaBersih, 0, ',', '.') }}</td>
-                </tr>
-            </tbody>
+    @foreach($barangs as $b)
+    @if($b->terjual > 0)
+    <tr>
+        <td class="pl-6 py-1 italic text-gray-500">Beban Pokok {{ $b->nama_barang }}</td>
+        <td class="text-right py-1 font-mono text-gray-500">({{ number_format($b->harga_beli * $b->terjual, 0, ',', '.') }})</td>
+    </tr>
+    @endif
+    @endforeach
+
+    <tr class="font-bold border-t border-black bg-gray-50">
+        <td class="py-2">JUMLAH BEBAN POKOK PENJUALAN</td>
+        <td class="text-right py-2">({{ number_format($totalHPP, 0, ',', '.') }})</td>
+    </tr>
+
+    <tr class="font-bold text-base bg-gray-100">
+        <td class="py-4 uppercase tracking-wider">LABA KOTOR</td>
+        <td class="text-right py-4 border-t-2 border-black">{{ number_format($labaKotor, 0, ',', '.') }}</td>
+    </tr>
+
+    <tr class="font-black text-xl border-b-4 border-double border-black pt-10">
+        <td class="py-6 uppercase">LABA BERSIH</td>
+        <td class="text-right py-6 text-green-700 font-mono">{{ number_format($labaBersih, 0, ',', '.') }}</td>
+    </tr>
+</tbody>
+           
         </table>
 
         <div class="mt-20 flex justify-end">
@@ -88,6 +96,4 @@
             </div>
         </div>
     </div>
-
-</body>
-</html>
+    
